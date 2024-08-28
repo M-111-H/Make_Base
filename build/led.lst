@@ -1,0 +1,166 @@
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccrCRALZ.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"led.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "./HARDWARE/LED/led.c"
+  18              		.section	.text.LED_Init,"ax",%progbits
+  19              		.align	1
+  20              		.global	LED_Init
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	LED_Init:
+  26              	.LFB29:
+   1:./HARDWARE/LED/led.c **** /*
+   2:./HARDWARE/LED/led.c ****  * @Descripttion: 
+   3:./HARDWARE/LED/led.c ****  * @version: 
+   4:./HARDWARE/LED/led.c ****  * @Author: 王明红
+   5:./HARDWARE/LED/led.c ****  * @Date: 2024-08-23 09:35:53
+   6:./HARDWARE/LED/led.c ****  * @LastEditors: 王明红
+   7:./HARDWARE/LED/led.c ****  * @LastEditTime: 2024-08-23 09:38:30
+   8:./HARDWARE/LED/led.c ****  */
+   9:./HARDWARE/LED/led.c **** #include "led.h"
+  10:./HARDWARE/LED/led.c **** #include "stm32f10x_rcc.h"
+  11:./HARDWARE/LED/led.c **** #include "stm32f10x_gpio.h"
+  12:./HARDWARE/LED/led.c **** #include "stdint.h"
+  13:./HARDWARE/LED/led.c **** //////////////////////////////////////////////////////////////////////////////////	 
+  14:./HARDWARE/LED/led.c **** //本程序只供学习使用，未经作者许可，不得用于其它任何用途
+  15:./HARDWARE/LED/led.c **** //ALIENTEK 精英STM32开发板
+  16:./HARDWARE/LED/led.c **** //LED驱动代码	   
+  17:./HARDWARE/LED/led.c **** //正点原子@ALIENTEK
+  18:./HARDWARE/LED/led.c **** //技术论坛:www.openedv.com
+  19:./HARDWARE/LED/led.c **** //修改日期:2012/9/2
+  20:./HARDWARE/LED/led.c **** //版本：V1.0
+  21:./HARDWARE/LED/led.c **** //版权所有，盗版必究。
+  22:./HARDWARE/LED/led.c **** //Copyright(C) 广州市星翼电子科技有限公司 2009-2019
+  23:./HARDWARE/LED/led.c **** //All rights reserved									  
+  24:./HARDWARE/LED/led.c **** ////////////////////////////////////////////////////////////////////////////////// 	   
+  25:./HARDWARE/LED/led.c **** 
+  26:./HARDWARE/LED/led.c **** //初始化PB5和PE5为输出口.并使能这两个口的时钟		    
+  27:./HARDWARE/LED/led.c **** //LED IO初始化
+  28:./HARDWARE/LED/led.c **** void LED_Init(void)
+  29:./HARDWARE/LED/led.c **** {
+  27              		.loc 1 29 1 view -0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 8
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccrCRALZ.s 			page 2
+
+
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31 0000 30B5     		push	{r4, r5, lr}
+  32              	.LCFI0:
+  33              		.cfi_def_cfa_offset 12
+  34              		.cfi_offset 4, -12
+  35              		.cfi_offset 5, -8
+  36              		.cfi_offset 14, -4
+  37 0002 83B0     		sub	sp, sp, #12
+  38              	.LCFI1:
+  39              		.cfi_def_cfa_offset 24
+  30:./HARDWARE/LED/led.c ****  
+  31:./HARDWARE/LED/led.c ****  GPIO_InitTypeDef  GPIO_InitStructure;
+  40              		.loc 1 31 2 view .LVU1
+  32:./HARDWARE/LED/led.c ****  	
+  33:./HARDWARE/LED/led.c ****  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB|RCC_APB2Periph_GPIOE, ENABLE);	 //使能PB,PE端口时钟
+  41              		.loc 1 33 2 view .LVU2
+  42 0004 0121     		movs	r1, #1
+  43 0006 4820     		movs	r0, #72
+  44 0008 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+  45              	.LVL0:
+  34:./HARDWARE/LED/led.c **** 	
+  35:./HARDWARE/LED/led.c ****  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;				 //LED0-->PB.5 端口配置
+  46              		.loc 1 35 2 view .LVU3
+  47              		.loc 1 35 30 is_stmt 0 view .LVU4
+  48 000c 2024     		movs	r4, #32
+  49 000e ADF80440 		strh	r4, [sp, #4]	@ movhi
+  36:./HARDWARE/LED/led.c ****  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; 		 //推挽输出
+  50              		.loc 1 36 2 is_stmt 1 view .LVU5
+  51              		.loc 1 36 31 is_stmt 0 view .LVU6
+  52 0012 1023     		movs	r3, #16
+  53 0014 8DF80730 		strb	r3, [sp, #7]
+  37:./HARDWARE/LED/led.c ****  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;		 //IO口速度为50MHz
+  54              		.loc 1 37 2 is_stmt 1 view .LVU7
+  55              		.loc 1 37 32 is_stmt 0 view .LVU8
+  56 0018 0323     		movs	r3, #3
+  57 001a 8DF80630 		strb	r3, [sp, #6]
+  38:./HARDWARE/LED/led.c ****  GPIO_Init(GPIOB, &GPIO_InitStructure);					 //根据设定参数初始化GPIOB.5
+  58              		.loc 1 38 2 is_stmt 1 view .LVU9
+  59 001e 0B4D     		ldr	r5, .L3
+  60 0020 01A9     		add	r1, sp, #4
+  61 0022 2846     		mov	r0, r5
+  62 0024 FFF7FEFF 		bl	GPIO_Init
+  63              	.LVL1:
+  39:./HARDWARE/LED/led.c ****  GPIO_SetBits(GPIOB,GPIO_Pin_5);						 //PB.5 输出高
+  64              		.loc 1 39 2 view .LVU10
+  65 0028 2146     		mov	r1, r4
+  66 002a 2846     		mov	r0, r5
+  67 002c FFF7FEFF 		bl	GPIO_SetBits
+  68              	.LVL2:
+  40:./HARDWARE/LED/led.c **** 
+  41:./HARDWARE/LED/led.c ****  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;	    		 //LED1-->PE.5 端口配置, 推挽输出
+  69              		.loc 1 41 2 view .LVU11
+  70              		.loc 1 41 30 is_stmt 0 view .LVU12
+  71 0030 ADF80440 		strh	r4, [sp, #4]	@ movhi
+  42:./HARDWARE/LED/led.c ****  GPIO_Init(GPIOE, &GPIO_InitStructure);	  				 //推挽输出 ，IO口速度为50MHz
+  72              		.loc 1 42 2 is_stmt 1 view .LVU13
+  73 0034 05F54065 		add	r5, r5, #3072
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccrCRALZ.s 			page 3
+
+
+  74 0038 01A9     		add	r1, sp, #4
+  75 003a 2846     		mov	r0, r5
+  76 003c FFF7FEFF 		bl	GPIO_Init
+  77              	.LVL3:
+  43:./HARDWARE/LED/led.c ****  GPIO_SetBits(GPIOE,GPIO_Pin_5); 						 //PE.5 输出高 
+  78              		.loc 1 43 2 view .LVU14
+  79 0040 2146     		mov	r1, r4
+  80 0042 2846     		mov	r0, r5
+  81 0044 FFF7FEFF 		bl	GPIO_SetBits
+  82              	.LVL4:
+  44:./HARDWARE/LED/led.c **** }
+  83              		.loc 1 44 1 is_stmt 0 view .LVU15
+  84 0048 03B0     		add	sp, sp, #12
+  85              	.LCFI2:
+  86              		.cfi_def_cfa_offset 12
+  87              		@ sp needed
+  88 004a 30BD     		pop	{r4, r5, pc}
+  89              	.L4:
+  90              		.align	2
+  91              	.L3:
+  92 004c 000C0140 		.word	1073810432
+  93              		.cfi_endproc
+  94              	.LFE29:
+  96              		.text
+  97              	.Letext0:
+  98              		.file 2 "c:\\vscode_tool_chain\\gcc\\12.2 mpacbti-rel1\\arm-none-eabi\\include\\machine\\_default_
+  99              		.file 3 "c:\\vscode_tool_chain\\gcc\\12.2 mpacbti-rel1\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 100              		.file 4 "User/stm32f10x.h"
+ 101              		.file 5 "Libraries/STM32F10x_FWLib/inc/stm32f10x_gpio.h"
+ 102              		.file 6 "Libraries/STM32F10x_FWLib/inc/stm32f10x_rcc.h"
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccrCRALZ.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 led.c
+C:\Users\24105\AppData\Local\Temp\ccrCRALZ.s:19     .text.LED_Init:00000000 $t
+C:\Users\24105\AppData\Local\Temp\ccrCRALZ.s:25     .text.LED_Init:00000000 LED_Init
+C:\Users\24105\AppData\Local\Temp\ccrCRALZ.s:92     .text.LED_Init:0000004c $d
+
+UNDEFINED SYMBOLS
+RCC_APB2PeriphClockCmd
+GPIO_Init
+GPIO_SetBits

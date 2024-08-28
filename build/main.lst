@@ -1,0 +1,529 @@
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccni3v2f.s 			page 1
+
+
+   1              		.cpu cortex-m3
+   2              		.arch armv7-m
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.file 1 "./User/main.c"
+  18              		.section	.text.led0_task,"ax",%progbits
+  19              		.align	1
+  20              		.global	led0_task
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	led0_task:
+  26              	.LFB39:
+   1:./User/main.c **** /*
+   2:./User/main.c ****  * @Descripttion:
+   3:./User/main.c ****  * @version:
+   4:./User/main.c ****  * @Author: 王明红
+   5:./User/main.c ****  * @Date: 2024-08-24 23:29:04
+   6:./User/main.c ****  * @LastEditors: 王明红
+   7:./User/main.c ****  * @LastEditTime: 2024-08-27 09:11:07
+   8:./User/main.c ****  */
+   9:./User/main.c **** #include "sys.h"
+  10:./User/main.c **** #include "delay.h"
+  11:./User/main.c **** #include "usart.h"
+  12:./User/main.c **** #include "led.h"
+  13:./User/main.c **** #include "FreeRTOS.h"
+  14:./User/main.c **** #include "task.h"
+  15:./User/main.c **** #include "misc.h"
+  16:./User/main.c **** #include <stdio.h>
+  17:./User/main.c **** 
+  18:./User/main.c **** // 任务优先级
+  19:./User/main.c **** #define START_TASK_PRIO 1
+  20:./User/main.c **** // 任务堆栈大小
+  21:./User/main.c **** #define START_STK_SIZE 128
+  22:./User/main.c **** // 任务句柄
+  23:./User/main.c **** TaskHandle_t StartTask_Handler;
+  24:./User/main.c **** // 任务函数
+  25:./User/main.c **** void start_task(void);
+  26:./User/main.c **** 
+  27:./User/main.c **** // 任务优先级
+  28:./User/main.c **** #define LED0_TASK_PRIO 2
+  29:./User/main.c **** // 任务堆栈大小
+  30:./User/main.c **** #define LED0_STK_SIZE 50
+  31:./User/main.c **** // 任务句柄
+  32:./User/main.c **** TaskHandle_t LED0Task_Handler;
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccni3v2f.s 			page 2
+
+
+  33:./User/main.c **** // 任务函数
+  34:./User/main.c **** void led0_task(void);
+  35:./User/main.c **** 
+  36:./User/main.c **** // 任务优先级
+  37:./User/main.c **** #define LED1_TASK_PRIO 3
+  38:./User/main.c **** // 任务堆栈大小
+  39:./User/main.c **** #define LED1_STK_SIZE 50
+  40:./User/main.c **** // 任务句柄
+  41:./User/main.c **** TaskHandle_t LED1Task_Handler;
+  42:./User/main.c **** // 任务函数
+  43:./User/main.c **** void led1_task(void);
+  44:./User/main.c **** /************************************************
+  45:./User/main.c ****  跑马灯实验
+  46:./User/main.c **** ************************************************/
+  47:./User/main.c **** int main(void)
+  48:./User/main.c **** {
+  49:./User/main.c **** 	delay_init();	   // 延时函数初始化
+  50:./User/main.c **** 	LED_Init();		   // 初始化与LED连接的硬件接口
+  51:./User/main.c **** 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4); // 设置系统中断优先级分组4
+  52:./User/main.c **** 	uart_init(115200); // 初始化串口
+  53:./User/main.c **** 	while (1)
+  54:./User/main.c **** 	{
+  55:./User/main.c **** 		LED0 = 0;
+  56:./User/main.c **** 		LED1 = 0;
+  57:./User/main.c **** 		delay_ms(100); // 延时300ms
+  58:./User/main.c **** 		LED0 = 1;
+  59:./User/main.c **** 		LED1 = 1;
+  60:./User/main.c **** 		delay_ms(100); // 延时300ms
+  61:./User/main.c **** 
+  62:./User/main.c **** 
+  63:./User/main.c **** 		// printf("hellow");
+  64:./User/main.c **** 	}
+  65:./User/main.c **** 	//创建开始任务
+  66:./User/main.c **** 	xTaskCreate((TaskFunction_t)start_task,			 // 任务函数
+  67:./User/main.c **** 				(const char *)"start_task",			 // 任务名称
+  68:./User/main.c **** 				(uint16_t)START_STK_SIZE,			 // 任务堆栈大小
+  69:./User/main.c **** 				(void *)NULL,						 // 传递给任务函数的参数
+  70:./User/main.c **** 				(UBaseType_t)START_TASK_PRIO,		 // 任务优先级
+  71:./User/main.c **** 				(TaskHandle_t *)&StartTask_Handler); // 任务句柄
+  72:./User/main.c **** 	vTaskStartScheduler(); // 开启任务调度
+  73:./User/main.c **** }
+  74:./User/main.c **** 
+  75:./User/main.c **** // 开始任务任务函数
+  76:./User/main.c **** void start_task(void)
+  77:./User/main.c **** {
+  78:./User/main.c **** 	LED0 = 0;
+  79:./User/main.c **** 	LED1 = 1;
+  80:./User/main.c **** 	delay_ms(100); // 延时300ms
+  81:./User/main.c **** 	LED0 = 1;
+  82:./User/main.c **** 	LED1 = 0;
+  83:./User/main.c **** 	delay_ms(100);		  // 延时300ms
+  84:./User/main.c **** 	taskENTER_CRITICAL(); // 进入临界区
+  85:./User/main.c **** 	// 创建LED0任务
+  86:./User/main.c **** 	xTaskCreate((TaskFunction_t)led0_task,
+  87:./User/main.c **** 				(const char *)"led0_task",
+  88:./User/main.c **** 				(uint16_t)LED0_STK_SIZE,
+  89:./User/main.c **** 				(void *)NULL,
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccni3v2f.s 			page 3
+
+
+  90:./User/main.c **** 				(UBaseType_t)LED0_TASK_PRIO,
+  91:./User/main.c **** 				(TaskHandle_t *)&LED0Task_Handler);
+  92:./User/main.c **** 	// 创建LED1任务
+  93:./User/main.c **** 	xTaskCreate((TaskFunction_t)led1_task,
+  94:./User/main.c **** 				(const char *)"led1_task",
+  95:./User/main.c **** 				(uint16_t)LED1_STK_SIZE,
+  96:./User/main.c **** 				(void *)NULL,
+  97:./User/main.c **** 				(UBaseType_t)LED1_TASK_PRIO,
+  98:./User/main.c **** 				(TaskHandle_t *)&LED1Task_Handler);
+  99:./User/main.c **** 
+ 100:./User/main.c **** 	vTaskDelete(StartTask_Handler); // 删除开始任务
+ 101:./User/main.c **** 
+ 102:./User/main.c **** 	taskEXIT_CRITICAL(); // 退出临界区
+ 103:./User/main.c **** }
+ 104:./User/main.c **** 
+ 105:./User/main.c **** // LED0任务函数
+ 106:./User/main.c **** void led0_task(void)
+ 107:./User/main.c **** {
+  27              		.loc 1 107 1 view -0
+  28              		.cfi_startproc
+  29              		@ Volatile: function does not return.
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 08B5     		push	{r3, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 3, -8
+  36              		.cfi_offset 14, -4
+  37              	.L2:
+ 108:./User/main.c **** 	while (1)
+  38              		.loc 1 108 2 discriminator 1 view .LVU1
+ 109:./User/main.c **** 	{
+ 110:./User/main.c **** 		LED0 = ~LED0;
+  39              		.loc 1 110 3 discriminator 1 view .LVU2
+  40              		.loc 1 110 11 is_stmt 0 discriminator 1 view .LVU3
+  41 0002 054A     		ldr	r2, .L4
+  42 0004 D2F89431 		ldr	r3, [r2, #404]
+  43              		.loc 1 110 10 discriminator 1 view .LVU4
+  44 0008 DB43     		mvns	r3, r3
+  45              		.loc 1 110 8 discriminator 1 view .LVU5
+  46 000a C2F89431 		str	r3, [r2, #404]
+ 111:./User/main.c **** 		vTaskDelay(500);
+  47              		.loc 1 111 3 is_stmt 1 discriminator 1 view .LVU6
+  48 000e 4FF4FA70 		mov	r0, #500
+  49 0012 FFF7FEFF 		bl	vTaskDelay
+  50              	.LVL0:
+ 108:./User/main.c **** 	while (1)
+  51              		.loc 1 108 8 discriminator 1 view .LVU7
+  52 0016 F4E7     		b	.L2
+  53              	.L5:
+  54              		.align	2
+  55              	.L4:
+  56 0018 00802142 		.word	1109491712
+  57              		.cfi_endproc
+  58              	.LFE39:
+  60              		.section	.text.led1_task,"ax",%progbits
+  61              		.align	1
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccni3v2f.s 			page 4
+
+
+  62              		.global	led1_task
+  63              		.syntax unified
+  64              		.thumb
+  65              		.thumb_func
+  67              	led1_task:
+  68              	.LFB40:
+ 112:./User/main.c **** 	}
+ 113:./User/main.c **** }
+ 114:./User/main.c **** 
+ 115:./User/main.c **** // LED1任务函数
+ 116:./User/main.c **** void led1_task(void)
+ 117:./User/main.c **** {
+  69              		.loc 1 117 1 view -0
+  70              		.cfi_startproc
+  71              		@ Volatile: function does not return.
+  72              		@ args = 0, pretend = 0, frame = 0
+  73              		@ frame_needed = 0, uses_anonymous_args = 0
+  74 0000 08B5     		push	{r3, lr}
+  75              	.LCFI1:
+  76              		.cfi_def_cfa_offset 8
+  77              		.cfi_offset 3, -8
+  78              		.cfi_offset 14, -4
+  79              	.L7:
+ 118:./User/main.c **** 	while (1)
+  80              		.loc 1 118 2 discriminator 1 view .LVU9
+ 119:./User/main.c **** 	{
+ 120:./User/main.c **** 		LED1 = 0;
+  81              		.loc 1 120 3 discriminator 1 view .LVU10
+  82              		.loc 1 120 8 is_stmt 0 discriminator 1 view .LVU11
+  83 0002 074C     		ldr	r4, .L9
+  84 0004 0023     		movs	r3, #0
+  85 0006 C4F89431 		str	r3, [r4, #404]
+ 121:./User/main.c **** 		vTaskDelay(200);
+  86              		.loc 1 121 3 is_stmt 1 discriminator 1 view .LVU12
+  87 000a C820     		movs	r0, #200
+  88 000c FFF7FEFF 		bl	vTaskDelay
+  89              	.LVL1:
+ 122:./User/main.c **** 		LED1 = 1;
+  90              		.loc 1 122 3 discriminator 1 view .LVU13
+  91              		.loc 1 122 8 is_stmt 0 discriminator 1 view .LVU14
+  92 0010 0123     		movs	r3, #1
+  93 0012 C4F89431 		str	r3, [r4, #404]
+ 123:./User/main.c **** 		vTaskDelay(800);
+  94              		.loc 1 123 3 is_stmt 1 discriminator 1 view .LVU15
+  95 0016 4FF44870 		mov	r0, #800
+  96 001a FFF7FEFF 		bl	vTaskDelay
+  97              	.LVL2:
+ 118:./User/main.c **** 	{
+  98              		.loc 1 118 8 discriminator 1 view .LVU16
+  99 001e F0E7     		b	.L7
+ 100              	.L10:
+ 101              		.align	2
+ 102              	.L9:
+ 103 0020 00002342 		.word	1109590016
+ 104              		.cfi_endproc
+ 105              	.LFE40:
+ 107              		.section	.text.main,"ax",%progbits
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccni3v2f.s 			page 5
+
+
+ 108              		.align	1
+ 109              		.global	main
+ 110              		.syntax unified
+ 111              		.thumb
+ 112              		.thumb_func
+ 114              	main:
+ 115              	.LFB37:
+  48:./User/main.c **** 	delay_init();	   // 延时函数初始化
+ 116              		.loc 1 48 1 view -0
+ 117              		.cfi_startproc
+ 118              		@ Volatile: function does not return.
+ 119              		@ args = 0, pretend = 0, frame = 0
+ 120              		@ frame_needed = 0, uses_anonymous_args = 0
+ 121 0000 08B5     		push	{r3, lr}
+ 122              	.LCFI2:
+ 123              		.cfi_def_cfa_offset 8
+ 124              		.cfi_offset 3, -8
+ 125              		.cfi_offset 14, -4
+  49:./User/main.c **** 	LED_Init();		   // 初始化与LED连接的硬件接口
+ 126              		.loc 1 49 2 view .LVU18
+ 127 0002 FFF7FEFF 		bl	delay_init
+ 128              	.LVL3:
+  50:./User/main.c **** 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4); // 设置系统中断优先级分组4
+ 129              		.loc 1 50 2 view .LVU19
+ 130 0006 FFF7FEFF 		bl	LED_Init
+ 131              	.LVL4:
+  51:./User/main.c **** 	uart_init(115200); // 初始化串口
+ 132              		.loc 1 51 2 view .LVU20
+ 133 000a 4FF44070 		mov	r0, #768
+ 134 000e FFF7FEFF 		bl	NVIC_PriorityGroupConfig
+ 135              	.LVL5:
+  52:./User/main.c **** 	while (1)
+ 136              		.loc 1 52 2 view .LVU21
+ 137 0012 4FF4E130 		mov	r0, #115200
+ 138 0016 FFF7FEFF 		bl	uart_init
+ 139              	.LVL6:
+ 140              	.L12:
+  53:./User/main.c **** 	{
+ 141              		.loc 1 53 2 discriminator 1 view .LVU22
+  55:./User/main.c **** 		LED1 = 0;
+ 142              		.loc 1 55 3 discriminator 1 view .LVU23
+  55:./User/main.c **** 		LED1 = 0;
+ 143              		.loc 1 55 8 is_stmt 0 discriminator 1 view .LVU24
+ 144 001a 094D     		ldr	r5, .L14
+ 145 001c 0023     		movs	r3, #0
+ 146 001e C5F89431 		str	r3, [r5, #404]
+  56:./User/main.c **** 		delay_ms(100); // 延时300ms
+ 147              		.loc 1 56 3 is_stmt 1 discriminator 1 view .LVU25
+  56:./User/main.c **** 		delay_ms(100); // 延时300ms
+ 148              		.loc 1 56 8 is_stmt 0 discriminator 1 view .LVU26
+ 149 0022 084C     		ldr	r4, .L14+4
+ 150 0024 C4F89431 		str	r3, [r4, #404]
+  57:./User/main.c **** 		LED0 = 1;
+ 151              		.loc 1 57 3 is_stmt 1 discriminator 1 view .LVU27
+ 152 0028 6420     		movs	r0, #100
+ 153 002a FFF7FEFF 		bl	delay_ms
+ 154              	.LVL7:
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccni3v2f.s 			page 6
+
+
+  58:./User/main.c **** 		LED1 = 1;
+ 155              		.loc 1 58 3 discriminator 1 view .LVU28
+  58:./User/main.c **** 		LED1 = 1;
+ 156              		.loc 1 58 8 is_stmt 0 discriminator 1 view .LVU29
+ 157 002e 0123     		movs	r3, #1
+ 158 0030 C5F89431 		str	r3, [r5, #404]
+  59:./User/main.c **** 		delay_ms(100); // 延时300ms
+ 159              		.loc 1 59 3 is_stmt 1 discriminator 1 view .LVU30
+  59:./User/main.c **** 		delay_ms(100); // 延时300ms
+ 160              		.loc 1 59 8 is_stmt 0 discriminator 1 view .LVU31
+ 161 0034 C4F89431 		str	r3, [r4, #404]
+  60:./User/main.c **** 
+ 162              		.loc 1 60 3 is_stmt 1 discriminator 1 view .LVU32
+ 163 0038 6420     		movs	r0, #100
+ 164 003a FFF7FEFF 		bl	delay_ms
+ 165              	.LVL8:
+  53:./User/main.c **** 	{
+ 166              		.loc 1 53 8 discriminator 1 view .LVU33
+ 167 003e ECE7     		b	.L12
+ 168              	.L15:
+ 169              		.align	2
+ 170              	.L14:
+ 171 0040 00802142 		.word	1109491712
+ 172 0044 00002342 		.word	1109590016
+ 173              		.cfi_endproc
+ 174              	.LFE37:
+ 176              		.section	.rodata.start_task.str1.4,"aMS",%progbits,1
+ 177              		.align	2
+ 178              	.LC0:
+ 179 0000 6C656430 		.ascii	"led0_task\000"
+ 179      5F746173 
+ 179      6B00
+ 180 000a 0000     		.align	2
+ 181              	.LC1:
+ 182 000c 6C656431 		.ascii	"led1_task\000"
+ 182      5F746173 
+ 182      6B00
+ 183              		.section	.text.start_task,"ax",%progbits
+ 184              		.align	1
+ 185              		.global	start_task
+ 186              		.syntax unified
+ 187              		.thumb
+ 188              		.thumb_func
+ 190              	start_task:
+ 191              	.LFB38:
+  77:./User/main.c **** 	LED0 = 0;
+ 192              		.loc 1 77 1 view -0
+ 193              		.cfi_startproc
+ 194              		@ args = 0, pretend = 0, frame = 0
+ 195              		@ frame_needed = 0, uses_anonymous_args = 0
+ 196 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 197              	.LCFI3:
+ 198              		.cfi_def_cfa_offset 20
+ 199              		.cfi_offset 4, -20
+ 200              		.cfi_offset 5, -16
+ 201              		.cfi_offset 6, -12
+ 202              		.cfi_offset 7, -8
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccni3v2f.s 			page 7
+
+
+ 203              		.cfi_offset 14, -4
+ 204 0002 83B0     		sub	sp, sp, #12
+ 205              	.LCFI4:
+ 206              		.cfi_def_cfa_offset 32
+  78:./User/main.c **** 	LED1 = 1;
+ 207              		.loc 1 78 2 view .LVU35
+  78:./User/main.c **** 	LED1 = 1;
+ 208              		.loc 1 78 7 is_stmt 0 view .LVU36
+ 209 0004 174E     		ldr	r6, .L18
+ 210 0006 0024     		movs	r4, #0
+ 211 0008 C6F89441 		str	r4, [r6, #404]
+  79:./User/main.c **** 	delay_ms(100); // 延时300ms
+ 212              		.loc 1 79 2 is_stmt 1 view .LVU37
+  79:./User/main.c **** 	delay_ms(100); // 延时300ms
+ 213              		.loc 1 79 7 is_stmt 0 view .LVU38
+ 214 000c 164D     		ldr	r5, .L18+4
+ 215 000e 0127     		movs	r7, #1
+ 216 0010 C5F89471 		str	r7, [r5, #404]
+  80:./User/main.c **** 	LED0 = 1;
+ 217              		.loc 1 80 2 is_stmt 1 view .LVU39
+ 218 0014 6420     		movs	r0, #100
+ 219 0016 FFF7FEFF 		bl	delay_ms
+ 220              	.LVL9:
+  81:./User/main.c **** 	LED1 = 0;
+ 221              		.loc 1 81 2 view .LVU40
+  81:./User/main.c **** 	LED1 = 0;
+ 222              		.loc 1 81 7 is_stmt 0 view .LVU41
+ 223 001a C6F89471 		str	r7, [r6, #404]
+  82:./User/main.c **** 	delay_ms(100);		  // 延时300ms
+ 224              		.loc 1 82 2 is_stmt 1 view .LVU42
+  82:./User/main.c **** 	delay_ms(100);		  // 延时300ms
+ 225              		.loc 1 82 7 is_stmt 0 view .LVU43
+ 226 001e C5F89441 		str	r4, [r5, #404]
+  83:./User/main.c **** 	taskENTER_CRITICAL(); // 进入临界区
+ 227              		.loc 1 83 2 is_stmt 1 view .LVU44
+ 228 0022 6420     		movs	r0, #100
+ 229 0024 FFF7FEFF 		bl	delay_ms
+ 230              	.LVL10:
+  84:./User/main.c **** 	// 创建LED0任务
+ 231              		.loc 1 84 2 view .LVU45
+ 232 0028 FFF7FEFF 		bl	vPortEnterCritical
+ 233              	.LVL11:
+  86:./User/main.c **** 				(const char *)"led0_task",
+ 234              		.loc 1 86 2 view .LVU46
+ 235 002c 0F4B     		ldr	r3, .L18+8
+ 236 002e 0193     		str	r3, [sp, #4]
+ 237 0030 0223     		movs	r3, #2
+ 238 0032 0093     		str	r3, [sp]
+ 239 0034 2346     		mov	r3, r4
+ 240 0036 3222     		movs	r2, #50
+ 241 0038 0D49     		ldr	r1, .L18+12
+ 242 003a 0E48     		ldr	r0, .L18+16
+ 243 003c FFF7FEFF 		bl	xTaskCreate
+ 244              	.LVL12:
+  93:./User/main.c **** 				(const char *)"led1_task",
+ 245              		.loc 1 93 2 view .LVU47
+ 246 0040 0D4B     		ldr	r3, .L18+20
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccni3v2f.s 			page 8
+
+
+ 247 0042 0193     		str	r3, [sp, #4]
+ 248 0044 0323     		movs	r3, #3
+ 249 0046 0093     		str	r3, [sp]
+ 250 0048 2346     		mov	r3, r4
+ 251 004a 3222     		movs	r2, #50
+ 252 004c 0B49     		ldr	r1, .L18+24
+ 253 004e 0C48     		ldr	r0, .L18+28
+ 254 0050 FFF7FEFF 		bl	xTaskCreate
+ 255              	.LVL13:
+ 100:./User/main.c **** 
+ 256              		.loc 1 100 2 view .LVU48
+ 257 0054 0B4B     		ldr	r3, .L18+32
+ 258 0056 1868     		ldr	r0, [r3]
+ 259 0058 FFF7FEFF 		bl	vTaskDelete
+ 260              	.LVL14:
+ 102:./User/main.c **** }
+ 261              		.loc 1 102 2 view .LVU49
+ 262 005c FFF7FEFF 		bl	vPortExitCritical
+ 263              	.LVL15:
+ 103:./User/main.c **** 
+ 264              		.loc 1 103 1 is_stmt 0 view .LVU50
+ 265 0060 03B0     		add	sp, sp, #12
+ 266              	.LCFI5:
+ 267              		.cfi_def_cfa_offset 20
+ 268              		@ sp needed
+ 269 0062 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 270              	.L19:
+ 271              		.align	2
+ 272              	.L18:
+ 273 0064 00802142 		.word	1109491712
+ 274 0068 00002342 		.word	1109590016
+ 275 006c 00000000 		.word	LED0Task_Handler
+ 276 0070 00000000 		.word	.LC0
+ 277 0074 00000000 		.word	led0_task
+ 278 0078 00000000 		.word	LED1Task_Handler
+ 279 007c 0C000000 		.word	.LC1
+ 280 0080 00000000 		.word	led1_task
+ 281 0084 00000000 		.word	StartTask_Handler
+ 282              		.cfi_endproc
+ 283              	.LFE38:
+ 285              		.global	LED1Task_Handler
+ 286              		.section	.bss.LED1Task_Handler,"aw",%nobits
+ 287              		.align	2
+ 290              	LED1Task_Handler:
+ 291 0000 00000000 		.space	4
+ 292              		.global	LED0Task_Handler
+ 293              		.section	.bss.LED0Task_Handler,"aw",%nobits
+ 294              		.align	2
+ 297              	LED0Task_Handler:
+ 298 0000 00000000 		.space	4
+ 299              		.global	StartTask_Handler
+ 300              		.section	.bss.StartTask_Handler,"aw",%nobits
+ 301              		.align	2
+ 304              	StartTask_Handler:
+ 305 0000 00000000 		.space	4
+ 306              		.text
+ 307              	.Letext0:
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccni3v2f.s 			page 9
+
+
+ 308              		.file 2 "c:\\vscode_tool_chain\\gcc\\12.2 mpacbti-rel1\\arm-none-eabi\\include\\machine\\_default_
+ 309              		.file 3 "c:\\vscode_tool_chain\\gcc\\12.2 mpacbti-rel1\\arm-none-eabi\\include\\sys\\_stdint.h"
+ 310              		.file 4 "FreeRTOS/include/projdefs.h"
+ 311              		.file 5 "FreeRTOS/portable/GCC/ARM_CM3/portmacro.h"
+ 312              		.file 6 "FreeRTOS/include/task.h"
+ 313              		.file 7 "SYSTEM/delay/delay.h"
+ 314              		.file 8 "SYSTEM/usart/usart.h"
+ 315              		.file 9 "Libraries/STM32F10x_FWLib/inc/misc.h"
+ 316              		.file 10 "HARDWARE/LED/led.h"
+ 317              		.file 11 "User/stm32f10x.h"
+ARM GAS  C:\Users\24105\AppData\Local\Temp\ccni3v2f.s 			page 10
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:19     .text.led0_task:00000000 $t
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:25     .text.led0_task:00000000 led0_task
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:56     .text.led0_task:00000018 $d
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:61     .text.led1_task:00000000 $t
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:67     .text.led1_task:00000000 led1_task
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:103    .text.led1_task:00000020 $d
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:108    .text.main:00000000 $t
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:114    .text.main:00000000 main
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:171    .text.main:00000040 $d
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:177    .rodata.start_task.str1.4:00000000 $d
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:184    .text.start_task:00000000 $t
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:190    .text.start_task:00000000 start_task
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:273    .text.start_task:00000064 $d
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:297    .bss.LED0Task_Handler:00000000 LED0Task_Handler
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:290    .bss.LED1Task_Handler:00000000 LED1Task_Handler
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:304    .bss.StartTask_Handler:00000000 StartTask_Handler
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:287    .bss.LED1Task_Handler:00000000 $d
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:294    .bss.LED0Task_Handler:00000000 $d
+C:\Users\24105\AppData\Local\Temp\ccni3v2f.s:301    .bss.StartTask_Handler:00000000 $d
+
+UNDEFINED SYMBOLS
+vTaskDelay
+delay_init
+LED_Init
+NVIC_PriorityGroupConfig
+uart_init
+delay_ms
+vPortEnterCritical
+xTaskCreate
+vTaskDelete
+vPortExitCritical

@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:/vscode_tool_chain/gcc/12.2 mpacbti-rel1/lib/gcc/arm-none-eabi/12.2.1/include",
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+             "compilerPath": "C:/vscode_tool_chain/gcc/12.2 mpacbti-rel1/bin/arm-none-eabi-gcc.exe",
+            // "compilerPath": "C:\\vscode_tool_chain\\mingw64\\bin\\gcc.exe",
+            "intelliSenseMode": "gcc-x64",
+            // "configurationProvider": "ms-vscode.makefile-tools",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17"
+        }
+    ],
+    "version": 4
+}
+

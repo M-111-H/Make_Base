@@ -1,0 +1,38 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "编译",
+			"command": "make",
+			"args": [
+				
+			],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+		},
+
+
+	{
+		"type": "shell",
+		// "label": "Build & Update",
+		"label": "下载",
+		"command": "openocd",
+		"args": [
+			"-f",
+			"C:/vscode_tool_chain/OpenOCD-20230202-0.12.0/share/openocd/scripts/interface/stlink-v2.cfg",
+			"-f",
+			"C:/vscode_tool_chain/OpenOCD-20230202-0.12.0/share/openocd/scripts/target/stm32f1x.cfg",
+			"-c",
+			"program build/Basemake.elf verify reset exit"
+		],
+		"problemMatcher": [
+			"$gcc"
+		],
+		"group": "build",
+	}
+
+   ]
+}
